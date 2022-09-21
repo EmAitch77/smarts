@@ -1,16 +1,11 @@
 {
     "time": {
-        "open": 11,
-        "close": 8
+        "open": null,
+        "close": null
     },
     "rooms": {
-        "updates": 1020167896468570152,
-        "channels": [
-            1020044943244406804,
-            1020044974789767278,
-            1020045002447007795,
-            1020045035951108136
-        ]
+        "updates": null,
+        "channels": []
     },
     "owner": null,
     "set": false
