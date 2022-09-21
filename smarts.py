@@ -9,7 +9,7 @@ from datetime import datetime
 import data_functions as db
 import json
 import time
-import asyncio
+import pytz
 load_dotenv(find_dotenv())
 token = os.getenv('TOKEN')
 bot = commands.Bot(command_prefix="-", intents=discord.Intents.all())
@@ -39,6 +39,8 @@ class abot(discord.Client):
         await tree.sync()
         self.synced = True
         print(f"Bot is online as {bot.user.display_name}")
+        activity = discord.Game(name= f"Smart S on top", type=3)
+        await bot.change_presence(status=discord.Status.idle, activity=activity)
 bot = abot()
 tree= app_commands.CommandTree(bot)
 
@@ -46,7 +48,8 @@ tree= app_commands.CommandTree(bot)
 @tasks.loop(seconds= 1)
 async def day_loop():
     guild = discord.Object(id=1020044841922609313)
-    now = datetime.now()
+    zone = pytz.timezone('Africa/Cairo')
+    now = datetime.now(zone)
     if now.hour == db.get_time('open'):
         for channel in db.load_channels():
             await bot.get_channel(channel).set_permissions(bot.guilds[0].default_role, view_channel=True)
@@ -56,7 +59,7 @@ async def day_loop():
             colour= discord.Colour.random()
             )
         embed.set_author(name=f"{bot.user.display_name}", icon_url=bot.user.display_avatar)
-        await msg.edit(db.get_updates())(content="**||@here|| تم فتح رومات البيع**", embed=embed)
+        await msg.edit(content="**||@here|| تم فتح رومات البيع**", embed=embed)
         await bot.get_channel(db.get_updates()).send('||@here||', delete_after=1)
         await asyncio.sleep(60*61)
     elif now.hour == db.get_time('close'):
@@ -150,7 +153,7 @@ async def self(interation: discord.Interaction):
 async def self(interation: discord.Interaction, action:app_commands.Choice[str]):
     if interation.user.guild_permissions.administrator:
         if action.value == 'start':
-            await interation.response.send_message(f"Bot started | Current time {datetime.now().strftime('%H:%M')}", ephemeral=True)
+            await interation.response.send_message(f"Bot started | Current time {datetime.now(pytz.timezone('Africa/Cairo')).strftime('%H:%M')}", ephemeral=True)
             day_loop.start()
         if action.value == 'stop':
             await interation.response.send_message(f"Bot Stopped | Current time {datetime.now().strftime('%H:%M')}", ephemeral=True)
